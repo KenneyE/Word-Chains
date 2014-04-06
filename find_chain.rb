@@ -1,3 +1,5 @@
+require 'set'
+
 def adjacent_words(word, dictionary)
   adj_words = []
   word_array = word.split("")
@@ -13,32 +15,48 @@ def adjacent_words(word, dictionary)
 end
 
 def intake_dict(file)
-  File.readlines(file).map { |word| word.chomp }
+  File.readlines(file).map { |word| word.chomp }.to_set
 end
 
 def find_chain(source, target, dictionary)
+  target.downcase!
+  source.downcase!
   words_to_expand = [source]
   parents = {}
   dict = intake_dict(dictionary)
-  candidate_words = dict.select! { |dict_word| dict_word.length == source.length }
+  candidate_words = dict.select { |dict_word| dict_word.length == source.length }
 
-  until words_to_expand.empty?
+  until words_to_expand.empty? || parents.has_key?(target)
     word = words_to_expand.pop
     adj_words = adjacent_words(word, candidate_words)
 
     adj_words.each do |adj_word|
       parents[adj_word] = word
-      break if adj_word == target
-      words_to_expand << adj_word
     end
+    words_to_expand += adj_words
     candidate_words -= adj_words
   end
 
-  all_reachable_words
+  build_path_from_breadcrumbs(source, target, parents)
 end
 
-def build_path_from_breadcrumbs
+def build_path_from_breadcrumbs(source, target, parents)
 
+  unless parents.has_key?(target)
+    puts "No link exists."
+    return nil
+  end
+
+  path = [target]
+
+  p parents[target]
+  until path.include?(source)
+    parent = parents[target]
+    path << parent
+    target = parent
+  end
+
+  path.reverse
 end
 
-p explore_words("cat", './dictionary.txt')
+p find_chain("hello", "saggy", './dictionary.txt')

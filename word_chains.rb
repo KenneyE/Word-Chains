@@ -1,3 +1,5 @@
+require 'set'
+
 def adjacent_words(word, dictionary)
   adj_words = []
   word_array = word.split("")
@@ -13,14 +15,14 @@ def adjacent_words(word, dictionary)
 end
 
 def intake_dict(file)
-  File.readlines(file).map { |word| word.chomp }
+  File.readlines(file).map { |word| word.chomp }.to_set
 end
 
 def explore_words(source, dictionary)
   words_to_expand = [source]
   all_reachable_words = [source]
   dict = intake_dict(dictionary)
-  candidate_words = dict.select! { |dict_word| dict_word.length == source.length }
+  candidate_words = dict.select { |dict_word| dict_word.length == source.length }
 
   until words_to_expand.empty?
     word = words_to_expand.pop
@@ -34,4 +36,4 @@ def explore_words(source, dictionary)
   all_reachable_words
 end
 
-p explore_words("cat", './dictionary.txt')
+p explore_words("hello", './dictionary.txt')
