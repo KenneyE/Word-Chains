@@ -16,9 +16,9 @@ def intake_dict(file)
   File.readlines(file).map { |word| word.chomp }
 end
 
-def explore_words(source, dictionary)
+def find_chain(source, target, dictionary)
   words_to_expand = [source]
-  all_reachable_words = [source]
+  parents = {}
   dict = intake_dict(dictionary)
   candidate_words = dict.select! { |dict_word| dict_word.length == source.length }
 
@@ -26,12 +26,19 @@ def explore_words(source, dictionary)
     word = words_to_expand.pop
     adj_words = adjacent_words(word, candidate_words)
 
-    words_to_expand += adj_words
-    all_reachable_words += adj_words
+    adj_words.each do |adj_word|
+      parents[adj_word] = word
+      break if adj_word == target
+      words_to_expand << adj_word
+    end
     candidate_words -= adj_words
   end
 
   all_reachable_words
+end
+
+def build_path_from_breadcrumbs
+
 end
 
 p explore_words("cat", './dictionary.txt')
